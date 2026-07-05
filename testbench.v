@@ -1,4 +1,4 @@
-`timescale 1ns / 100 ps
+`timescale 1 ns / 100 ps
 
 module tb_clock_gen;
 
