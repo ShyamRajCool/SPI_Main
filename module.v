@@ -1,10 +1,10 @@
-`timescale 1ns / 100 ps
+`timescale 1 ns / 100 ps
 
 //A BCD counter is needed to divide the clk in to the clk out (should be put within spi_main)
 
 module spi_main(
                 input[7:0] MISO, 
-                input[7:0] POMI, //primary out main in (the value that will be used ofr MOSI)
+                input[7:0] POMI, //primary out main in (the value that will be used for MOSI)
 
                 input
                 reset,
@@ -30,6 +30,7 @@ module spi_main(
     reg[1:0] state, next_state;
     reg[3:0] sample_counter; //Goes to 8
 
+    //This needs to be checked
     bcdcount divide10 (.clk(clk_in), .reset(reset), .q(clock_counter));
     assign divider = clock_counter == 8;
 
@@ -80,21 +81,23 @@ module spi_main(
             if (reset) begin
                 sample_counter <= 4'h0;
             end
-            if (CPOL == 0 && CPHA == 0) begin
-                MOSI[sample_counter] <= POMI[sample_counter];
-                sample_counter <= sample_counter + 1'b1;
-            end
-            else if (CPOL == 0 && CPHA == 1) begin
-                PIMO[sample_counter] <= MISO[sample_counter];
-                sample_counter <= sample_counter + 1'b1;
-            end
-            else if (CPOL == 1 && CPHA == 0) begin
-                PIMO[sample_counter] <= MISO[sample_counter];
-                sample_counter <= sample_counter + 1'b1;
-            end
-            else if (CPOL == 1 && CPHA == 1) begin
-                MOSI[sample_counter] <= POMI[sample_counter];
-                sample_counter <= sample_counter + 1'b1;
+            else begin
+                if (CPOL == 0 && CPHA == 0) begin
+                    MOSI[sample_counter] <= POMI[sample_counter];
+                    sample_counter <= sample_counter + 1'b1;
+                end
+                else if (CPOL == 0 && CPHA == 1) begin
+                    PIMO[sample_counter] <= MISO[sample_counter];
+                    sample_counter <= sample_counter + 1'b1;
+                end
+                else if (CPOL == 1 && CPHA == 0) begin
+                    PIMO[sample_counter] <= MISO[sample_counter];
+                    sample_counter <= sample_counter + 1'b1;
+                end
+                else if (CPOL == 1 && CPHA == 1) begin
+                    MOSI[sample_counter] <= POMI[sample_counter];
+                    sample_counter <= sample_counter + 1'b1;
+                end
             end
     end
 
@@ -108,7 +111,7 @@ module bcdcount(input clk, reset,
                 output reg [3:0] q
 );
 
-    always @ (posedge clk) begin //async reset
+    always @ (posedge clk) begin //sync reset
         if (reset) begin
             q <= 4'b0000;
         end
