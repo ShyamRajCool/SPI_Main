@@ -44,10 +44,12 @@ module tb_clock_gen;
         CPOL = 1'b0;
         CPHA = 1'b0;
 
-        input_MISO = 8'b10000001;
-        input_POMI = 8'b10000011;
+        input_MISO = 8'b10101011;
+        input_POMI = 8'b11010011;
 
-        #200;
+        #800
         $finish;
+
     end
+
 endmodule
